@@ -1,0 +1,41 @@
+- name: Administrar servidores Ubuntu
+  hosts: docker
+  gather_facts: true
+
+  tasks:
+    - name: Mostrar nombre del servidor
+      ansible.builtin.debug:
+        msg: "Servidor: {{ ansible_hostname }}"
+
+    - name: Mostrar sistema operativo
+      ansible.builtin.debug:
+        msg: "Sistema operativo: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Crear directorio principal
+      ansible.builtin.file:
+        path: /tmp/ansible-demo
+        state: directory
+        mode: '0755'
+
+    - name: Crear archivo info.txt
+      ansible.builtin.copy:
+        dest: /tmp/ansible-demo/info.txt
+        content: |
+          Servidor: {{ ansible_hostname }}
+          Sistema operativo: {{ ansible_distribution }} {{ ansible_distribution_version }}
+        mode: '0644'
+
+    - name: Crear subdirectorios
+      ansible.builtin.file:
+        path: "/tmp/ansible-demo/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - logs
+        - backup
+        - config
+
+    - name: Mostrar mensaje si el sistema operativo es Ubuntu
+      ansible.builtin.debug:
+        msg: "Este servidor utiliza Ubuntu."
+      when: ansible_distribution == "Ubuntu"
